@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Set locale and time zone
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-export LANGUAGE=en_US.UTF-8
 export LC_TIME=en_US.UTF-8
 export TZ=Asia/Kolkata
 
@@ -49,7 +46,7 @@ while read -r line; do
     timestamp=$(echo $line | jq -r '.dt_txt')
     temperature_kelvin=$(echo $line | jq -r '.main.temp')
     temperature_celsius=$(kelvin_to_celsius "$temperature_kelvin")
-    condition=$(echo $line | jq -r '.weather.description')
+    condition=$(echo $line | jq -r '.weather[0].description')
 
     # Get weather icon based on weather condition
     weather_icon=$(get_weather_icon "$condition")
@@ -63,16 +60,9 @@ echo "# Weather Forecast for the Whole Day" > README.md
 echo -e "\nThis content is dynamically generated in Indian Time (IST): $indian_time\n" >> README.md
 echo -e "| Time | Temperature | Condition |\n| --- | --- | --- |\n$formatted_weather" >> README.md
 
-# Configure Git
-git config --global user.email "action@github.com"
-git config --global user.name "GitHub Action"
-
 # Commit changes
 git add README.md
 git commit -m "Update README with weather forecast for the whole day"
 
-# Pull latest changes from the remote repository
-git pull origin main
-
 # Push changes
-git push origin main
+git push
