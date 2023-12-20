@@ -16,7 +16,7 @@ kelvin_to_celsius() {
 indian_time=$(date +'%Y-%m-%d %H:%M:%S %Z')
 
 # Get weather details for a specific city (e.g., Mumbai)
-city="Mumbai"
+city="Coimbatore"
 weather_info=$(curl -s "http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHERMAP_API_KEY}")
 
 # Extract relevant information from the weather response (customize as needed)
