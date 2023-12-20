@@ -12,16 +12,6 @@ kelvin_to_celsius() {
     echo "scale=2; $1 - 273.15" | bc
 }
 
-# Generate dynamic content (current date and time in Indian Standard Time)
-indian_time=$(date +'%Y-%m-%d %H:%M:%S %Z')
-
-# Get weather details for a specific city (e.g., Mumbai)
-city="Coimbatore"
-weather_info=$(curl -s "http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHERMAP_API_KEY}")
-
-# Extract relevant information from the weather response (customize as needed)
-hourly_data=$(echo $weather_info | jq -r '.list[] | {dt_txt, main: .main, weather: .weather[0]}')
-
 # Function to get weather icon based on weather condition
 get_weather_icon() {
     case $1 in
@@ -43,6 +33,16 @@ get_weather_icon() {
     esac
 }
 
+# Generate dynamic content (current date and time in Indian Standard Time)
+indian_time=$(date +'%Y-%m-%d %H:%M:%S %Z')
+
+# Get weather details for a specific city (e.g., Mumbai)
+city="Mumbai"
+weather_info=$(curl -s "http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHERMAP_API_KEY}")
+
+# Extract relevant information for the next 24 hours
+next_24_hours_data=$(echo "$weather_info" | jq -r '.list[] | select(.dt_txt | strptime("%Y-%m-%d %H:%M:%S") | mktime >= now and strptime("%Y-%m-%d %H:%M:%S") | mktime <= (now + (24*60*60))) | {dt_txt, main: .main, weather: .weather[0]}')
+
 # Format hourly weather information
 formatted_weather=""
 while read -r line; do
@@ -56,10 +56,10 @@ while read -r line; do
 
     # Add formatted information
     formatted_weather+="| $timestamp | $weather_icon $temperature_celsius °C | $condition |\n"
-done <<< "$hourly_data"
+done <<< "$next_24_hours_data"
 
 # Update README file with the formatted weather information
-echo "# Hourly Weather Forecast" > README.md
+echo "# Next 24 Hours Weather Forecast" > README.md
 echo -e "\nThis content is dynamically generated in Indian Time (IST): $indian_time\n" >> README.md
 echo -e "| Time | Temperature | Condition |\n| --- | --- | --- |\n$formatted_weather" >> README.md
 
@@ -69,7 +69,7 @@ git config --global user.name "GitHub Action"
 
 # Commit changes
 git add README.md
-git commit -m "Update README with hourly weather forecast"
+git commit -m "Update README with next 24 hours weather forecast"
 
 # Pull latest changes from the remote repository
 git pull origin main
