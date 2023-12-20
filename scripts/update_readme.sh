@@ -9,7 +9,7 @@ export TZ=Asia/Kolkata
 
 # Function to convert Kelvin to Celsius
 kelvin_to_celsius() {
-    echo "scale=2; $1 - 273.15" | bc
+    awk "BEGIN {printf \"%.2f\", $1 - 273.15}"
 }
 
 # Function to get weather icon based on weather condition
