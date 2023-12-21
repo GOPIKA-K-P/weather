@@ -5,7 +5,7 @@ export TZ=Asia/Kolkata
 
 kelvin_to_celsius() {
     temperature_kelvin=$1
-    temperature_celsius=$(echo "scale=2; $temperature_kelvin - 273.15" | bc)
+    temperature_celsius=$(echo "$temperature_kelvin - 273.15" | bc)
     printf "%.2f" "$temperature_celsius"
 }
 
@@ -29,10 +29,12 @@ get_weather_icon() {
     esac
 }
 
-indian_time=$(date +'%Y-%m-%d %H:%M:%S %Z')
+indian_time=$(TZ=Asia/Kolkata date +'%Y-%m-%d %H:%M:%S %Z')
+
 
 city="Coimbatore"
 weather_info=$(curl -s "http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHERMAP_API_KEY}")
+
 
 next_24_hours_data=$(echo "$weather_info" | jq -r '.list[] | select(.dt_txt | strptime("%Y-%m-%d %H:%M:%S") | mktime >= now and strptime("%Y-%m-%d %H:%M:%S") | mktime <= (now + (24*60*60))) | {dt_txt, main: .main, weather: .weather[0]}')
 
@@ -54,5 +56,4 @@ echo -e "| Time | Temperature | Condition |\n| --- | --- | --- |\n$formatted_wea
 
 git add README.md
 git commit -m "Update README with weather forecast for the next 24 hours"
-
 git push
