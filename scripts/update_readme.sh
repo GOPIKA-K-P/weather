@@ -34,11 +34,11 @@ get_weather_icon() {
 indian_time=$(date +'%Y-%m-%d %H:%M:%S %Z')
 
 # Get weather details for a specific city (e.g., Mumbai)
-city="Mumbai"
+city="Coimbatore"
 weather_info=$(curl -s "http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHERMAP_API_KEY}")
 
-# Extract relevant information for the whole day
-whole_day_data=$(echo "$weather_info" | jq -r '.list[] | select(.dt_txt | strptime("%Y-%m-%d %H:%M:%S") | mktime >= now and strptime("%Y-%m-%d %H:%M:%S") | mktime <= (now + (24*60*60))) | {dt_txt, main: .main, weather: .weather[0]}')
+# Extract relevant information for the next 24 hours
+next_24_hours_data=$(echo "$weather_info" | jq -r '.list[] | select(.dt_txt | strptime("%Y-%m-%d %H:%M:%S") | mktime >= now and strptime("%Y-%m-%d %H:%M:%S") | mktime <= (now + (24*60*60))) | {dt_txt, main: .main, weather: .weather[0]}')
 
 # Format hourly weather information
 formatted_weather=""
@@ -53,16 +53,16 @@ while read -r line; do
 
     # Add formatted information
     formatted_weather+="| $timestamp | $temperature_celsius °C | $weather_icon $condition |\n"
-done <<< "$whole_day_data"
+done <<< "$next_24_hours_data"
 
 # Update README file with the formatted weather information
-echo "# Weather Forecast for the Whole Day" > README.md
+echo "# Weather Forecast for the Next 24 Hours" > README.md
 echo -e "\nThis content is dynamically generated in Indian Time (IST): $indian_time\n" >> README.md
 echo -e "| Time | Temperature | Condition |\n| --- | --- | --- |\n$formatted_weather" >> README.md
 
 # Commit changes
 git add README.md
-git commit -m "Update README with weather forecast for the whole day"
+git commit -m "Update README with weather forecast for the next 24 hours"
 
 # Push changes
 git push
