@@ -1,8 +1,8 @@
 # My Project
 
-This content is dynamically generated in Indian Time (IST): 2023-12-25 22:54:08 IST
+This content is dynamically generated in Indian Time (IST): 2023-12-25 23:03:36 IST
 
 
 Current Weather in Coimbatore:
-Temperature: 24.88 °C
-Condition: mist
+Temperature: 21.42 °C
+Condition: overcast clouds
